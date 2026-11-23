@@ -56,6 +56,13 @@ jobs:
         with:
           pattern: snowballs-*
           path: artifacts
-      - run: gh release create "$GITHUB_REF_NAME" artifacts/*/* --repo "$GITHUB_REPOSITORY" --verify-tag --generate-notes
+      - run: |
+          flags=()
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then
+            flags+=(--prerelease --title "4illSnowballs $GITHUB_REF_NAME" --notes "Experimental build for game testing. Review the README before installing.")
+          else
+            flags+=(--generate-notes)
+          fi
+          gh release create "$GITHUB_REF_NAME" artifacts/*/* --repo "$GITHUB_REPOSITORY" --verify-tag "${flags[@]}"
         env:
           GH_TOKEN: ${{ github.token }}
